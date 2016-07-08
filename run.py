@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, jsonify
-from users import users
-from groups import groups
+from blueprints.users import users
+from blueprints.groups import groups
 
 app = Flask(__name__)
 app.register_blueprint(users)
