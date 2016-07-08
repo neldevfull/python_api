@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, jsonify
+from groups import groups
 
 app = Flask(__name__)
+app.register_blueprint(groups)
 
 @app.route('/')
 def index():
