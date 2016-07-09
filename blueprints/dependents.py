@@ -36,3 +36,16 @@ def insert_depedent(id):
 
     response['message'] = 'Employee not found'
     return jsonify(response)
+
+@dependents.route('/employees/<int:id>/dependents/<int:did>/', methods=['GET'])
+def get_dependent(id, did):
+    data = db_read()
+
+    for employee in data.get('employees'):
+        if id == employee.get('id'):
+            for dependent in employee.get('dependents'):
+                if did == dependent.get('id'):
+                    return jsonify(dependent)
+
+    response['message'] = 'Dependent not found'
+    return jsonify(response)
