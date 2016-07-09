@@ -20,3 +20,19 @@ def get_all_dependents(id):
         return jsonify(response)
 
     return jsonify(dependents)
+
+@dependents.route('/employees/<int:id>/dependents/', methods=['POST'])
+def insert_depedent(id):
+    data = db_read()
+    dependent = request.get_json()
+
+    for employee in data.get('employees'):
+        if id == employee.get('id'):
+            employee.get('dependents').append(dependent)
+            db_write(data)
+
+            response['message'] = 'Dependent successfully registered'
+            return jsonify(response)
+
+    response['message'] = 'Employee not found'
+    return jsonify(response)
