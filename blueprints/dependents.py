@@ -49,3 +49,20 @@ def get_dependent(id, did):
 
     response['message'] = 'Dependent not found'
     return jsonify(response)
+
+@dependents.route('/employees/<int:id>/dependents/<int:did>/', methods=['DELETE'])
+def delete_dependent(id, did):
+    data = db_read()
+
+    for employee in data.get('employees'):
+        if id == employee.get('id'):
+            for dependent in employee.get('dependents'):
+                if did == dependent.get('id'):
+                    employee.get('dependents').remove(dependent)
+                    db_write(data)
+
+                    response['message'] = 'Dependent successfully deleted'
+                    return jsonify(response)
+
+    response['message'] = 'Dependent not found'
+    return jsonify(response)
