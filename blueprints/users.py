@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, jsonify
+from models.models import Users
+import json
 
 users = Blueprint('users', __name__)
 
 @users.route('/users', methods=['GET'])
 def get_users():
-    data = jsonify({'message': 'All users'})
-    return data
+    users = json.loads(Users.objects.to_json())
+    return jsonify({"users": users})
 
 @users.route('/users/<int:id>', methods=['GET'])
 def get_user(id):

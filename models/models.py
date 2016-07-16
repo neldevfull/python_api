@@ -22,9 +22,23 @@ class Groups(db.Document):
     members = db.ListField()
 
 
-if __name__ == '__main__':
-    user = Users()
-    user.name = 'John Deer'
-    user.email = 'john@example.com'
-    user.save()
-    print('User successfully registered')
+# if __name__ == '__main__':
+#     user_one = Users()
+#     user_one.name = 'John Deer'
+#     user_one.email = 'john@example.com'
+#     user_one.save()
+
+#     user_two = Users()
+#     user_two.name = 'Mary Jane'
+#     user_two.email = 'mary@example.com'
+#     user_two.save()
+
+#     print('Users successfully registered')
+
+#     group = Groups()
+#     group.name = 'Software Developers'
+#     group.members.append(user_one)
+#     group.members.append(user_two)
+#     group.save()
+
+#     print('Group successfully registered')
