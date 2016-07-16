@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from models.models import Users
 import json
 
-users = Blueprint('users', __name__)
+users   = Blueprint('users', __name__)
+message = {'message': '', 'data': None}
 
 @users.route('/users', methods=['GET'])
 def get_users():
@@ -18,8 +19,24 @@ def get_user(id):
 
 @users.route('/users', methods=['POST'])
 def insert_users():
-    data = jsonify({'message': 'Insert User!'})
-    return data
+    try:
+        users = request.get_json()
+        user  = Users()
+
+        for key in users.keys():
+            setattr(user, key, users[key])
+
+        user.save()
+
+        message['message'] = 'User successfully registered'
+        message['data']    = json.loads(user.to_json())
+
+        return jsonify(message)
+    except Exception as e:
+        message['message'] = 'Failed to save User'
+        message['data']    = e
+
+        return jsonify(message)
 
 @users.route('/users/<int:id>', methods=['PUT'])
 def update_users(id):

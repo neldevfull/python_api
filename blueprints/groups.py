@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, jsonify
+from models.models import Groups
+import json
 
 groups = Blueprint('groups', __name__)
 
 @groups.route('/groups')
 def list_groups():
-    data = jsonify({'message': 'All groups!'})
-    return data
+    groups = json.loads(Groups.objects.to_json())
+    return jsonify({"groups": groups})
 
 @groups.route('/groups/<int:id>', methods=['GET'])
 def get_group(id):
