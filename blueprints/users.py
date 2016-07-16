@@ -50,10 +50,32 @@ def insert_users():
 
     return jsonify(message), status
 
-@users.route('/users/<int:id>', methods=['PUT'])
+@users.route('/users/<id>', methods=['PUT'])
 def update_users(id):
-    data = jsonify({'message': 'Update User %s!' % id})
-    return data
+    status = 200
+
+    try:
+        data = request.get_json()
+        user = Users.objects(id=id).first()
+
+        if user:
+            for key in data.keys():
+                setattr(user, key, data[key])
+
+            user.save()
+
+            message['message'] = 'User successfully updated'
+            message['user'] = json.loads(user.to_json())
+        else:
+            message['message'] = 'User not found'
+            message['user'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Failed to save User'
+        message['error'] = e
+
+    return jsonify(message), status
 
 @users.route('/users/<id>', methods=['DELETE'])
 def delete_users(id):
