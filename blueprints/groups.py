@@ -1,32 +1,132 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, jsonify
-from models.models import Groups
+from flask import Blueprint, request, jsonify
+from models.models import Users, Groups
 import json
 
 groups = Blueprint('groups', __name__)
+message = {}
 
-@groups.route('/groups')
-def list_groups():
+@groups.route('/groups', methods=['GET'])
+def get_all_groups():
     groups = json.loads(Groups.objects.to_json())
-    return jsonify({"groups": groups})
+    message['groups'] = groups
 
-@groups.route('/groups/<int:id>', methods=['GET'])
-def get_group(id):
-    data = jsonify({'message': 'Search group %s' % id})
-    return data
+    return jsonify(message)
+
+@groups.route('/groups/<id>', methods=['GET'])
+def get_groups(id):
+    status = 200
+
+    try:
+        group = Groups.objects(id=id)
+
+        if group:
+            message['message'] = 'Group successfully found'
+            message['group'] = json.loads(group.to_json())
+        else:
+            message['message'] = 'Group not found'
+            message['group'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Error inserting group'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
+
 
 @groups.route('/groups', methods=['POST'])
-def insert_groups():
-    data = jsonify({'message': 'Insert group!'})
-    return data
+def insert_group():
+    status = 200
 
-@groups.route('/groups/<int:id>', methods=['PUT'])
-def update_groups(id):
-    data = jsonify({'message': 'Update group %s!' % id})
-    return data
+    try:
+        user  = None
+        group = Groups()
+        data  = request.get_json()
 
-@groups.route('/groups/<int:id>', methods=['DELETE'])
-def delete_groups(id):
-    data = jsonify({'message': 'Delete group %s!' % id})
+        group.name = data['name']
+
+        for u in data.get('members'):
+            user = Users()
+            for key in u.keys():
+                setattr(user, key, u[key])
+            user.save()
+            group.members.append(user)
+
+        group.save()
+
+        message['message'] = 'Group successfuly registered'
+        message['group'] = json.loads(group.to_json())
+
+    except Exception as e:
+        message['message'] = 'Error inserting group'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
+
+@groups.route('/groups/<id>', methods=['DELETE'])
+def delete_group(id):
+    status = 200
+
+    try:
+        group = Groups.objects(id=id)
+
+        if group:
+            message['message'] = 'Group successfully deleted'
+            message['group'] = json.loads(group.to_json())
+
+            group.delete()
+        else:
+            message['message'] = 'Group not found'
+            message['group'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Error delete group'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
+
+@groups.route('/groups/<id>', methods=['PUT'])
+def update_group(id):
+    status = 200
+
+    try:
+        user  = None
+        group = Groups.objects(id=id).first()
+        data  = request.get_json()
+
+        if group:
+            group.name = data.get('name')
+
+            for u in data.get('members'):
+                user = Users.objects(id=u.get('id')).first()
+                user.name = u.get('name')
+                user.email = u.get('email')
+                user.save()
+
+                for item in group.members:
+                    if user == item:
+                        item = json.loads(user.to_json())
+
+            group.save()
+
+            message['message'] = 'Group successfully updated'
+            message['group'] = json.loads(group.to_json())
+
+        else:
+            message['message'] = 'Group not found'
+            message['group'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Error delete group'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
     return data
