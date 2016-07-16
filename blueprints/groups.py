@@ -15,11 +15,11 @@ def get_all_groups():
     return jsonify(message)
 
 @groups.route('/groups/<id>', methods=['GET'])
-def get_groups(id):
+def get_group(id):
     status = 200
 
     try:
-        group = Groups.objects(id=id)
+        group = Groups.objects(id=id).first()
 
         if group:
             message['message'] = 'Group successfully found'
