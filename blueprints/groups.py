@@ -129,4 +129,60 @@ def update_group(id):
         status = 500
 
     return jsonify(message), status
-    return data
+
+@groups.route('/groups/<id>/members', methods=['POST'])
+def insert_member(id):
+    status = 200
+
+    try:
+        group  = Groups.objects(id=id).first()
+        data   = request.get_json()
+        member = Users()
+
+        if group:
+            for key in data.keys():
+                setattr(member, key, data[key])
+
+            member.save()
+            group.members.append(member)
+            group.save()
+
+            message['message'] = 'Member successfully registered'
+            message['error'] = json.loads(member.to_json())
+        else:
+            message['message'] = 'Group not found'
+            message['group'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Error insert member'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
+
+@groups.route('/groups/<id>/members/<email>', methods=['DELETE'])
+def delete_member(id, email):
+    status = 200
+
+    try:
+        group  = Groups.objects(id=id).first()
+        member = Users.objects(email=email).first()
+
+        if group and member:
+            group.members.remove(member)
+            group.save()
+
+            message['message'] = 'Member successfully deleted'
+            message['error'] = json.loads(member.to_json())
+        else:
+            message['message'] = 'Group or Member not found'
+            message['group'] = None
+            status = 404
+
+    except Exception as e:
+        message['message'] = 'Error delete member'
+        message['error'] = e
+        status = 500
+
+    return jsonify(message), status
