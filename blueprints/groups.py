@@ -36,7 +36,6 @@ def get_group(id):
 
     return jsonify(message), status
 
-
 @groups.route('/groups', methods=['POST'])
 def insert_group():
     status = 200
