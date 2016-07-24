@@ -47,11 +47,3 @@ class DockerManager:
 
         except Exception as e:
             print('Fail %s' %e)
-
-
-if __name__ == '__main__':
-    dm = DockerManager()
-
-    # dm.create_container("containerone", "containerone.net", 'ubuntu')
-    # dm.get_info()
-    dm.inspect_container('1f89fdec3803')
